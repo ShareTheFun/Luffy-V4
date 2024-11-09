@@ -3,184 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajiro API - Free REST API Service</title>
-    <meta name="description" content="Ajiro API is a free REST API service providing various endpoints for AI, news, and search functionalities.">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Luffy V4 API - Free REST API Service</title>
+    <meta name="description" content="Luffy API: A comprehensive, free REST API service providing diverse endpoints for developers">
+    <meta name="keywords" content="API, REST API, free API, developer tools, web service">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js" as="script">
     <style>
+        :root {
+            --bg-primary: #111827;
+            --bg-secondary: #1F2937;
+            --text-primary: #ffffff;
+            --text-secondary: #9CA3AF;
+        }
+        body { 
+            background-color: var(--bg-primary); 
+            color: var(--text-primary);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
             opacity: 0;
         }
-        .accordion-content.open {
-            max-height: 1000px;
-            opacity: 1;
+        .accordion-content.open { 
+            max-height: 1000px; 
+            opacity: 1; 
         }
         #particles-js {
             position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
+            inset: 0;
             z-index: -1;
+            pointer-events: none;
         }
+        .dashboard {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: var(--bg-secondary);
+            transition: left 0.3s ease-out;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard.open { left: 0; }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+        .overlay.open { display: block; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-900 text-white p-4 md:p-8">
-    <div id="particles-js"></div>
-    <header class="text-center mb-8">
-        <h1 class="text-4xl font-bold mb-2">Ajiro API</h1>
-        <p class="text-gray-400">Welcome to Ajiro API, a free REST API service</p>
-    </header>
+<body class="min-h-screen text-white p-4 md:p-8 antialiased">
+    <div id="particles-js" aria-hidden="true"></div>
 
-    <main class="max-w-4xl mx-auto space-y-12">
-        <section class="bg-gray-800 bg-opacity-75 rounded-lg p-6 shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Information</h2>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:p-2">
+        Skip to main content
+    </a>
+
+    <div class="sticky top-4 z-50 self-start">
+        <button id="hamburger" 
+                aria-label="Open API Navigation" 
+                aria-controls="dashboard" 
+                aria-expanded="false" 
+                class="bg-gray-800 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+
+    <div id="dashboard" class="dashboard" aria-hidden="true">
+        <div class="p-4">
+            <h2 class="text-2xl font-bold mb-4">API Dashboard</h2>
+            <div id="endpoints-container" role="list"></div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+    <main id="main-content" class="max-w-4xl mx-auto space-y-12">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold mb-2 bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
+                Luffy V4 API
+            </h1>
+            <p class="text-gray-400 text-lg">Free, Flexible, and Fast REST API Service</p>
+        </header>
+
+        <section class="bg-gray-800 bg-opacity-75 rounded-lg p-6 shadow-lg" aria-labelledby="info-section">
+            <h2 id="info-section" class="text-2xl font-bold mb-4">System Information</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <h3 class="font-semibold">Time</h3>
-                    <p id="current-time" aria-live="polite"></p>
+                    <h3 class="font-semibold text-gray-300">Current Time</h3>
+                    <p id="current-time" class="text-xl" aria-live="polite"></p>
                 </div>
                 <div>
-                    <h3 class="font-semibold">Date</h3>
-                    <p id="current-date" aria-live="polite"></p>
+                    <h3 class="font-semibold text-gray-300">Current Date</h3>
+                    <p id="current-date" class="text-xl" aria-live="polite"></p>
                 </div>
             </div>
         </section>
 
-        <section>
-            <h2 class="text-2xl font-bold mb-4">API Endpoints</h2>
-            <div class="space-y-2" id="endpoints-container"></div>
-        </section>
-
-        <section class="bg-gray-800 bg-opacity-75 rounded-lg p-6 shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Additional Information</h2>
-            <p class="text-gray-400">
-                This REST API website is still in the development stage (BETA). We appreciate your understanding regarding any shortcomings. Thank you!
-            </p>
+        <section class="bg-gray-800 bg-opacity-75 rounded-lg p-6 shadow-lg" aria-labelledby="beta-section">
+            <h2 id="beta-section" class="text-2xl font-bold mb-4">Development Status</h2>
+            <div class="flex items-center space-x-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p class="text-gray-400">
+                    This REST API is currently in BETA. We appreciate your understanding and welcome feedback.
+                </p>
+            </div>
         </section>
     </main>
 
-    <footer class="text-center mt-12 text-sm text-gray-500">
-        <p>Copyright © <span id="current-year"></span>AjiroDesu</p>
+    <footer class="text-center mt-12 text-sm text-gray-500 py-4">
+        <p>&copy; <span id="current-year"></span> LuffyDesu. All Rights Reserved.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
-        async function fetchApiList() {
-            try {
-                const response = await fetch('/api-list');
-                const apiList = await response.json();
-                return apiList;
-            } catch (error) {
-                console.error('Error fetching API list:', error);
-                return [];
+        // Performance and security optimization
+        'use strict';
+
+        class AjiroApiDashboard {
+            constructor() {
+                this.apiCache = new Map();
+                this.initEventListeners();
+                this.setupParticles();
+                this.startDateTimeUpdate();
+            }
+
+            async fetchApiList() {
+                try {
+                    if (this.apiCache.has('apiList')) {
+                        return this.apiCache.get('apiList');
+                    }
+                    const response = await fetch('/api-list');
+                    const apiList = await response.json();
+                    this.apiCache.set('apiList', apiList);
+                    return apiList;
+                } catch (error) {
+                    console.error('API List Fetch Error:', error);
+                    return [];
+                }
+            }
+
+            initEventListeners() {
+                const hamburger = document.getElementById('hamburger');
+                const overlay = document.getElementById('overlay');
+
+                hamburger.addEventListener('click', this.toggleDashboard.bind(this));
+                overlay.addEventListener('click', this.toggleDashboard.bind(this));
+            }
+
+            toggleDashboard() {
+                const dashboard = document.getElementById('dashboard');
+                const overlay = document.getElementById('overlay');
+                const hamburger = document.getElementById('hamburger');
+
+                dashboard.classList.toggle('open');
+                overlay.classList.toggle('open');
+
+                const isOpen = dashboard.classList.contains('open');
+                dashboard.setAttribute('aria-hidden', !isOpen);
+                overlay.setAttribute('aria-hidden', !isOpen);
+                hamburger.setAttribute('aria-expanded', isOpen);
+            }
+
+            startDateTimeUpdate() {
+                const updateDateTime = () => {
+                    const now = new Date();
+                    document.getElementById('current-time').textContent = now.toLocaleTimeString();
+                    document.getElementById('current-date').textContent = now.toLocaleDateString();
+                    document.getElementById('current-year').textContent = now.getFullYear();
+                };
+
+                updateDateTime();
+                setInterval(updateDateTime, 1000);
+            }
+
+            async initAccordions() {
+                const container = document.getElementById('endpoints-container');
+                const apiList = await this.fetchApiList();
+
+                const categories = apiList.reduce((acc, api) => {
+                    (acc[api.category] = acc[api.category] || []).push(api);
+                    return acc;
+                }, {});
+
+                Object.entries(categories).forEach(([category, items]) => {
+                    if (items.length > 0) {
+                        container.appendChild(this.createAccordion(category, items));
+                    }
+                });
+
+                this.setupAccordionListeners();
+            }
+
+            setupAccordionListeners() {
+                document.querySelectorAll('.accordion').forEach(accordion => {
+                    const header = accordion.querySelector('.accordion-header');
+                    const content = accordion.querySelector('.accordion-content');
+                    const arrow = header.querySelector('svg');
+
+                    header.addEventListener('click', () => {
+                        const isExpanded = header.getAttribute('aria-expanded') === 'true';
+                        header.setAttribute('aria-expanded', !isExpanded);
+                        content.setAttribute('aria-hidden', isExpanded);
+                        content.classList.toggle('open');
+                        arrow.classList.toggle('rotate-180');
+                    });
+                });
+            }
+
+            createAccordion(category, items) {
+                const accordion = document.createElement('div');
+                accordion.className = 'accordion mb-2';
+                accordion.innerHTML = `
+                    <div class="accordion-header bg-gray-700 p-3 rounded-md cursor-pointer flex justify-between items-center" aria-expanded="false">
+                        <span>${this.capitalizeFirstLetter(category)}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content" aria-hidden="true">
+                        <div class="space-y-2 mt-2">
+                            ${items.map(item => `
+                                <div class="flex items-center justify-between bg-gray-600 p-3 rounded-md">
+                                    <div>
+                                        <div class="font-medium">${this.capitalizeFirstLetter(item.name)}</div>
+                                        <div class="text-sm text-gray-400">${item.description}</div>
+                                    </div>
+                                    <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm ml-2 hover:bg-blue-600 transition-colors" aria-label="Use ${this.capitalizeFirstLetter(item.name)}" onclick="dashboard.useApi('${item.endpoint}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                return accordion;
+            }
+
+            capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            useApi(endpoint) {
+                window.open(endpoint, '_blank', 'noopener,noreferrer');
+            }
+
+            setupParticles() {
+                particlesJS('particles-js', {
+                    particles: {
+                        number: { value: 80, density: { enable: true, value_area: 800 } },
+                        color: { value: "#ffffff" },
+                        shape: { type: "circle", stroke: { width: 0, color: "#000000" } },
+                        opacity: { value: 0.5, random: false },
+                        size: { value: 3, random: true },
+                        line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                        move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out" }
+                    },
+                    interactivity: {
+                        detect_on: "canvas",
+                        events: { 
+                            onhover: { enable: true, mode: "repulse" }, 
+                            onclick: { enable: true, mode: "push" }, 
+                            resize: true 
+                        }
+                    },
+                    retina_detect: true
+                });
             }
         }
 
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = now.toLocaleTimeString();
-            document.getElementById('current-date').textContent = now.toLocaleDateString();
-            document.getElementById('current-year').textContent = now.getFullYear();
-        }
-
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-
-        function createAccordion(category, items) {
-            const accordion = document.createElement('div');
-            accordion.className = 'accordion mb-2';
-            accordion.innerHTML = `
-                <div class="bg-gray-800 bg-opacity-75 p-3 rounded-md cursor-pointer flex justify-between items-center" aria-expanded="false">
-                    <span>${capitalizeFirstLetter(category)}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="accordion-content" aria-hidden="true">
-                    <div class="space-y-2 mt-2">
-                        ${items.map(item => `
-                            <div class="flex items-center justify-between bg-gray-700 bg-opacity-75 p-3 rounded-md">
-                                <div>
-                                    <div class="font-medium">${capitalizeFirstLetter(item.name)}</div>
-                                    <div class="text-sm text-gray-400">${item.description}</div>
-                                </div>
-                                <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm ml-2 hover:bg-blue-600 transition-colors" aria-label="Use ${capitalizeFirstLetter(item.name)}" onclick="useApi('${item.endpoint}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            return accordion;
-        }
-
-        async function initAccordions() {
-            const container = document.getElementById('endpoints-container');
-            const apiList = await fetchApiList();
-
-            const categories = {};
-
-            apiList.forEach(api => {
-                if (!categories[api.category]) {
-                    categories[api.category] = [];
-                }
-                categories[api.category].push(api);
-            });
-
-            Object.entries(categories).forEach(([category, items]) => {
-                if (items.length > 0) {
-                    container.appendChild(createAccordion(category, items));
-                }
-            });
-
-            document.querySelectorAll('.accordion').forEach(accordion => {
-                const header = accordion.querySelector('div');
-                const content = accordion.querySelector('.accordion-content');
-                const arrow = header.querySelector('svg');
-
-                header.addEventListener('click', () => {
-                    const isExpanded = header.getAttribute('aria-expanded') === 'true';
-                    header.setAttribute('aria-expanded', !isExpanded);
-                    content.setAttribute('aria-hidden', isExpanded);
-                    content.classList.toggle('open');
-                    arrow.classList.toggle('rotate-180');
-                });
-            });
-        }
-
-        function useApi(endpoint) {
-            window.open(endpoint, '_blank');
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            setInterval(updateDateTime, 1000);
-            updateDateTime();
-            initAccordions();
-
-            particlesJS('particles-js', {
-                particles: {
-                    number: { value: 80, density: { enable: true, value_area: 800 } },
-                    color: { value: "#ffffff" },
-                    shape: { type: "circle", stroke: { width: 0, color: "#000000" } },
-                    opacity: { value: 0.5, random: false, anim: { enable: false } },
-                    size: { value: 3, random: true, anim: { enable: false } },
-                    line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-                    move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false, attract: { enable: false, rotateX: 600, rotateY: 1200 } }
-                },
-                interactivity: {
-                    detect_on: "canvas",
-                    events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
-                    modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
-                },
-                retina_detect: true
-            });
+            window.dashboard = new AjiroApiDashboard();
+            window.dashboard.initAccordions();
         });
     </script>
 </body>
